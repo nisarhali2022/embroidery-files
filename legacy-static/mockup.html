@@ -1,0 +1,254 @@
+<title>Embroidery File Exchange</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one centered work surface; a header bar, tabs, then a table card. Upload lives in a modal. */
+:root{
+  --bg:#f3f4f8; --surface:#ffffff; --ink:#1c2340; --muted:#5d6482; --line:#dfe2ec;
+  --accent:#2f4bd8; --accent-ink:#ffffff; --accent-soft:#e6eafc;
+  --thread:#c2410c; --thread-soft:#fdeee5; --ok:#15803d;
+  --overlay:rgba(20,24,45,.45);
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Inter", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12152a; --surface:#1b1f38; --ink:#e7e9f5; --muted:#a2a8c6; --line:#2e3355;
+  --accent:#7d93ff; --accent-ink:#0f1330; --accent-soft:#262d58;
+  --thread:#fb8a4c; --thread-soft:#3a2418; --ok:#4ade80; --overlay:rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12152a; --surface:#1b1f38; --ink:#e7e9f5; --muted:#a2a8c6; --line:#2e3355;
+  --accent:#7d93ff; --accent-ink:#0f1330; --accent-soft:#262d58;
+  --thread:#fb8a4c; --thread-soft:#3a2418; --ok:#4ade80; --overlay:rgba(0,0,0,.6); color-scheme:dark}
+
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{font-family:var(--f-display);text-wrap:balance;margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.mock-flag{display:flex;gap:8px;align-items:center;justify-content:center;background:var(--thread-soft);color:var(--thread);font-size:13px;font-weight:600;padding:6px 16px;text-align:center}
+
+/* Login */
+.login{min-height:calc(100% - 40px);display:grid;place-items:center;padding:32px 16px}
+.login-card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px;display:grid;gap:18px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{flex:none}
+.brand h1{font-size:22px}
+.login-card p{margin:0;color:var(--muted);font-size:14px}
+.field{display:grid;gap:6px}
+.field label{font-size:13px;font-weight:600}
+.field input{padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+.btn{border:0;border-radius:8px;padding:10px 16px;font-weight:600;background:var(--accent);color:var(--accent-ink);display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.small{padding:6px 12px;font-size:13px}
+.hint{font-size:12.5px;color:var(--muted);background:var(--bg);border-radius:8px;padding:10px 12px}
+.hint code{font-family:var(--f-mono);font-size:12px}
+.err{color:var(--thread);font-size:13px;margin:0}
+
+/* App */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.who{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+.role-pill{font-family:var(--f-mono);font-size:12px;padding:3px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{background:none;border:0;padding:12px 16px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.count{font-family:var(--f-mono);font-size:11.5px;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:1px 8px;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;padding:20px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.panel-head h2{font-size:19px}
+.panel-head p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+.readonly-note{font-size:13px;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:6px 12px}
+.table-box{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;min-width:520px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--bg);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.sn,th.sn{width:64px;font-variant-numeric:tabular-nums;font-family:var(--f-mono);font-size:13px}
+td.date{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--muted)}
+td.act,th.act{width:140px;text-align:right}
+.fname{display:flex;align-items:center;gap:10px;word-break:break-all}
+.ext{font-family:var(--f-mono);font-size:10.5px;font-weight:500;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--accent-soft);color:var(--accent);flex:none}
+.ext.emb{background:var(--thread-soft);color:var(--thread)}
+tr.new td{animation:flash 1.6s ease-out}
+@keyframes flash{from{background:var(--accent-soft)}to{background:transparent}}
+.dash{color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:32px}
+
+/* Modal */
+.overlay{position:fixed;inset:0;background:var(--overlay);display:grid;place-items:center;padding:16px;z-index:20}
+.modal{background:var(--surface);border-radius:14px;width:100%;max-width:520px;padding:22px;display:grid;gap:16px;border:1px solid var(--line)}
+.modal-head{display:flex;justify-content:space-between;align-items:center}
+.modal-head h2{font-size:19px}
+.x{background:none;border:0;font-size:22px;color:var(--muted);line-height:1;padding:4px 8px}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:34px 16px;text-align:center;display:grid;gap:8px;justify-items:center;transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop strong{font-size:15px}
+.drop span{color:var(--muted);font-size:13px}
+.linkbtn{background:none;border:0;color:var(--accent);font-weight:600;padding:0;text-decoration:underline}
+.queue{display:grid;gap:6px;max-height:160px;overflow:auto}
+.queue div{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;background:var(--bg);padding:8px 10px;border-radius:8px;word-break:break-all}
+.queue em{font-style:normal;color:var(--muted);flex:none}
+.modal-foot{display:flex;justify-content:flex-end;gap:8px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;z-index:30;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion:reduce){tr.new td{animation:none}.drop{transition:none}}
+@media (max-width:520px){.panel{padding:14px}.login-card{padding:22px}}
+</style>
+
+<div class="mock-flag">Mock-up preview: logins, uploads and downloads are simulated</div>
+
+<!-- LOGIN -->
+<section class="login" id="loginView">
+  <form class="login-card" id="loginForm" novalidate>
+    <div class="brand">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="none" stroke="var(--accent)" stroke-width="2.5"/><path d="M8 17h18" stroke="var(--thread)" stroke-width="2.5" stroke-dasharray="3 3" stroke-linecap="round"/><path d="M17 8v18" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="3 3" stroke-linecap="round"/></svg>
+      <h1>Embroidery File Exchange</h1>
+    </div>
+    <p>Sign in to share images and embroidery files.</p>
+    <div class="field"><label for="user">Username</label><input id="user" autocomplete="off" placeholder="admin or embroider"></div>
+    <div class="field"><label for="pass">Password</label><input id="pass" type="password" placeholder="Any password works in the mock-up"></div>
+    <p class="err" id="loginErr" hidden></p>
+    <button class="btn" type="submit">Sign in</button>
+    <div class="hint">Try <code>admin</code> or <code>embroider</code>. Sign out and sign in as the other user to see how each role differs.</div>
+  </form>
+</section>
+
+<!-- APP -->
+<div class="wrap" id="appView" hidden>
+  <header class="topbar">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="none" stroke="var(--accent)" stroke-width="2.5"/><path d="M8 17h18" stroke="var(--thread)" stroke-width="2.5" stroke-dasharray="3 3" stroke-linecap="round"/><path d="M17 8v18" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="3 3" stroke-linecap="round"/></svg>
+      <h1 style="font-size:19px">Embroidery File Exchange</h1>
+    </div>
+    <div class="who">Signed in as <span class="role-pill" id="whoName">admin</span>
+      <button class="btn ghost small" id="logout" type="button">Sign out</button></div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-images" aria-selected="true" data-tab="images">Images <span class="count" id="c-images">0</span></button>
+    <button class="tab" role="tab" id="tab-emb" aria-selected="false" data-tab="emb">Embroidery Files <span class="count" id="c-emb">0</span></button>
+  </div>
+
+  <section class="panel" role="tabpanel">
+    <div class="panel-head">
+      <div><h2 id="panelTitle">Images</h2><p id="panelSub"></p></div>
+      <div id="panelAction"></div>
+    </div>
+    <div class="table-box">
+      <table>
+        <thead><tr><th class="sn">S.No</th><th>File Name</th><th>Upload Date</th><th class="act">Download</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<!-- UPLOAD MODAL -->
+<div class="overlay" id="modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head"><h2 id="modalTitle">Upload images</h2><button class="x" id="closeModal" aria-label="Close" type="button">×</button></div>
+    <div class="drop" id="drop">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+      <strong>Drag and drop files here</strong>
+      <span>or <button class="linkbtn" id="browse" type="button">choose files</button> from your computer</span>
+      <input type="file" id="fileInput" multiple hidden>
+    </div>
+    <div class="queue" id="queue"></div>
+    <div class="modal-foot">
+      <button class="btn ghost" id="cancel" type="button">Cancel</button>
+      <button class="btn" id="doUpload" type="button" disabled>Upload</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const data = {
+  images: [
+    {name:"school_logo_front.png", date:"2026-11-14"},
+    {name:"jacket_back_eagle.jpg", date:"2026-11-17"},
+    {name:"cap_monogram_RK.png", date:"2026-11-19"}
+  ],
+  emb: [
+    {name:"school_logo_front.dst", date:"2026-11-16"},
+    {name:"jacket_back_eagle.pes", date:"2026-11-19"}
+  ]
+};
+// Who can upload / download in each tab
+const rules = {
+  images:{title:"Images", uploader:"admin", downloader:"embroider", modal:"Upload images"},
+  emb:{title:"Embroidery Files", uploader:"embroider", downloader:"admin", modal:"Upload embroidery files"}
+};
+let user=null, tab="images", pending=[], lastAdded=-1;
+const $=id=>document.getElementById(id);
+
+function fmt(d){const [y,m,day]=d.split("-");const mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+m-1];return `${day} ${mo} ${y}`}
+function today(){const t=new Date();return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`}
+function ext(n){const i=n.lastIndexOf(".");return i>0?n.slice(i+1):"file"}
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function toast(msg){const t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2400)}
+
+$("loginForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const u=$("user").value.trim().toLowerCase();
+  if(u!=="admin"&&u!=="embroider"){$("loginErr").textContent="Username not recognised. Use admin or embroider.";$("loginErr").hidden=false;return}
+  if(!$("pass").value){$("loginErr").textContent="Enter a password.";$("loginErr").hidden=false;return}
+  $("loginErr").hidden=true;user=u;tab="images";
+  $("loginView").hidden=true;$("appView").hidden=false;render();
+});
+$("logout").onclick=()=>{user=null;$("appView").hidden=true;$("loginView").hidden=false;$("pass").value="";$("user").focus()};
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;lastAdded=-1;render()});
+
+function render(){
+  const r=rules[tab];
+  $("whoName").textContent=user;
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
+  $("c-images").textContent=data.images.length;$("c-emb").textContent=data.emb.length;
+  $("panelTitle").textContent=r.title;
+  const canUp=user===r.uploader, canDown=user===r.downloader;
+  $("panelSub").textContent=canUp?`You upload here. ${r.downloader} downloads.`:`${r.uploader} uploads here. You download.`;
+  $("panelAction").innerHTML=canUp
+    ?`<button class="btn" id="openModal" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Upload</button>`
+    :`<span class="readonly-note">Only ${r.uploader} can upload here</span>`;
+  if(canUp) $("openModal").onclick=openModal;
+  const list=data[tab];
+  $("rows").innerHTML=list.length?list.map((f,i)=>`<tr class="${i===lastAdded?"new":""}">
+    <td class="sn">${i+1}</td>
+    <td><div class="fname"><span class="ext ${tab==="emb"?"emb":""}">${esc(ext(f.name))}</span>${esc(f.name)}</div></td>
+    <td class="date">${fmt(f.date)}</td>
+    <td class="act">${canDown?`<button class="btn small" data-dl="${i}" type="button">Download</button>`:`<span class="dash" title="${esc(r.downloader)} downloads these">—</span>`}</td>
+  </tr>`).join(""):`<tr><td colspan="4" class="empty">No files yet.</td></tr>`;
+  document.querySelectorAll("[data-dl]").forEach(b=>b.onclick=()=>toast(`Mock-up: "${list[+b.dataset.dl].name}" would download now.`));
+}
+
+function openModal(){pending=[];drawQueue();$("modalTitle").textContent=rules[tab].modal;$("modal").hidden=false;$("browse").focus()}
+function closeModal(){$("modal").hidden=true}
+$("closeModal").onclick=closeModal;$("cancel").onclick=closeModal;
+$("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("modal").hidden)closeModal()});
+$("browse").onclick=()=>$("fileInput").click();
+$("fileInput").onchange=e=>{addFiles(e.target.files);e.target.value=""};
+const drop=$("drop");
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over")}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over")}));
+drop.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
+function addFiles(fl){for(const f of fl)pending.push({name:f.name,size:f.size});drawQueue()}
+function size(b){return b>1048576?(b/1048576).toFixed(1)+" MB":Math.max(1,Math.round(b/1024))+" KB"}
+function drawQueue(){
+  $("queue").innerHTML=pending.map(f=>`<div><span>${esc(f.name)}</span><em>${size(f.size)}</em></div>`).join("");
+  $("doUpload").disabled=!pending.length;
+  $("doUpload").textContent=pending.length?`Upload ${pending.length} file${pending.length>1?"s":""}`:"Upload";
+}
+$("doUpload").onclick=()=>{
+  const n=pending.length;
+  pending.forEach(f=>data[tab].push({name:f.name,date:today()}));
+  lastAdded=data[tab].length-1;closeModal();render();
+  toast(`${n} file${n>1?"s":""} added to ${rules[tab].title}.`);
+};
+</script>
